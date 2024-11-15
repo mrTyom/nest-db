@@ -8,15 +8,20 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './users.service';
-import { User } from './users.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
+@ApiTags('Users')
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/create')
-  async create(@Body() userData: Partial<User>) {
+  @ApiOperation({ summary: 'Создать пользователя' })
+  @ApiResponse({ status: 201, description: 'Пользователь успешно создан.' })
+  async create(@Body() userData: CreateUserDto) {
     try {
       const user = await this.userService.create(userData);
       return { success: true, result: { id: user.id } };
@@ -26,7 +31,15 @@ export class UserController {
   }
 
   @Get('/get/:id?')
-  async get(@Param('id') id?: number, @Query() filters?: Partial<User>) {
+  @ApiOperation({ summary: 'Получить пользователя или список пользователей' })
+  @ApiResponse({
+    status: 200,
+    description: 'Пользователь или список пользователей.',
+  })
+  async get(
+    @Param('id') id?: number,
+    @Query() filters?: Partial<CreateUserDto>,
+  ) {
     try {
       if (id) {
         const user = await this.userService.findById(Number(id));
@@ -40,7 +53,9 @@ export class UserController {
   }
 
   @Patch('/update/:id')
-  async update(@Param('id') id: number, @Body() updates: Partial<User>) {
+  @ApiOperation({ summary: 'Обновить данные пользователя' })
+  @ApiResponse({ status: 200, description: 'Пользователь успешно обновлен.' })
+  async update(@Param('id') id: number, @Body() updates: UpdateUserDto) {
     try {
       const user = await this.userService.update(Number(id), updates);
       return { success: true, result: user };
@@ -50,6 +65,11 @@ export class UserController {
   }
 
   @Delete('/delete/:id?')
+  @ApiOperation({ summary: 'Удалить пользователя или всех пользователей' })
+  @ApiResponse({
+    status: 200,
+    description: 'Пользователь(и) успешно удален(ы).',
+  })
   async delete(@Param('id') id?: number) {
     try {
       const user = await this.userService.delete(id ? Number(id) : undefined);
