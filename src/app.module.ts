@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -18,8 +18,8 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [], // Добавить сюда пути к сущностям
-      synchronize: false, // Убедится, что это отключено в продакшене
+      entities: [__dirname + '/**/*.entity{.ts,.js}'], // Добавить сюда пути к сущностям
+      synchronize: true, // Убедится, что это отключено в PROD
     }),
   ],
   controllers: [AppController],
